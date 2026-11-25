@@ -1,0 +1,49 @@
+<% layout("listings/layouts/boilerplate") %>
+
+<body>
+<br>
+<% if (q || guests) { %>
+  <h1>Search results</h1>
+<% } else { %>
+  <h1>All Listings</h1>
+<% } %>
+<br>
+
+<form action="/listings" method="GET" role="search" class="listings-search mb-4">
+  <div class="input-group">
+    <input type="search" name="q" value="<%= q %>" class="form-control"
+           placeholder="Search by title, location or country" aria-label="Search listings">
+    <select name="guests" class="form-select listings-search-guests" aria-label="Number of guests">
+      <option value="" <%= guests ? "" : "selected" %>>Any guests</option>
+      <option value="1" <%= guests === 1 ? "selected" : "" %>>1 guest</option>
+      <option value="2" <%= guests === 2 ? "selected" : "" %>>2 guests</option>
+      <option value="4" <%= guests === 4 ? "selected" : "" %>>4 guests</option>
+      <option value="6" <%= guests === 6 ? "selected" : "" %>>6+ guests</option>
+    </select>
+    <button class="btn edit-btn" type="submit"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
+    <% if (q || guests) { %>
+      <a href="/listings" class="btn btn-outline-dark">Clear</a>
+    <% } %>
+  </div>
+</form>
+
+<% if (allListings.length === 0) { %>
+  <div class="empty-state">
+    <i class="fa-regular fa-compass"></i>
+    <% if (q || guests) { %>
+      <h4>No stays match your search</h4>
+      <p>Try a different destination or fewer guests, or <a href="/listings">browse all listings</a>.</p>
+    <% } else { %>
+      <h4>No listings yet</h4>
+      <p>Be the first to <a href="/listings/new">add a property</a>.</p>
+    <% } %>
+  </div>
+<% } else { %>
+  <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1 g-4">
+    <% for (let listing of allListings) { %>
+      <%- include("includes/listing-card", { listing }) %>
+    <% } %>
+  </div>
+<% } %>
+
+</body>

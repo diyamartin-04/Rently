@@ -1,0 +1,276 @@
+<% layout("listings/layouts/boilerplate") %>
+<%
+  const amenities = listing.amenities || [];
+  const maxGuests = listing.guests || 2;
+  const bedrooms = listing.bedrooms || 1;
+  const beds = listing.beds || 1;
+  const bathrooms = listing.bathrooms || 1;
+  const price = listing.price ?? 0;
+  const reviews = listing.reviews || [];
+  const description = listing.description || "";
+  const isLongDescription = description.length > 280;
+  const hostInitial = (host || "W").charAt(0).toUpperCase();
+  const pageData = {
+    price,
+    maxGuests,
+    location: listing.location || "",
+    booked,
+    prefill,
+    loggedIn: !!currentUser,
+  };
+%>
+
+<div class="listing-page">
+
+  <img class="listing-photo" src="<%= listing.image?.url %>" alt="<%= listing.title %>">
+
+  <header class="listing-header">
+    <h1 class="listing-heading">Entire place in <%= listing.location %>, <%= listing.country %></h1>
+    <p class="listing-specs">
+      <%= maxGuests %> guests &middot; <%= bedrooms %> bedrooms &middot; <%= beds %> beds &middot; <%= bathrooms %> bathrooms
+    </p>
+    <p class="listing-name"><%= listing.title %></p>
+  </header>
+
+  <div class="row g-4 g-lg-5">
+
+    <!-- Main column -->
+    <div class="col-lg-7 col-xl-8">
+
+      <!-- Guest rating summary -->
+      <% if (stats.guestFavourite) { %>
+        <div class="rating-box">
+          <div class="rating-box-main">
+            <div class="rating-badge">
+              <i class="fa-solid fa-award"></i>
+              <span>Guest<br>favourite</span>
+            </div>
+            <p class="rating-box-text">One of the most loved homes on Wanderlust, according to guests</p>
+          </div>
+          <div class="rating-box-stats">
+            <div>
+              <strong><%= stats.average.toFixed(2) %></strong>
+              <span class="rating-stars">
+                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+              </span>
+            </div>
+            <div>
+              <strong><%= stats.count %></strong>
+              <span>Reviews</span>
+            </div>
+          </div>
+        </div>
+      <% } else if (stats.count) { %>
+        <div class="rating-box">
+          <div class="rating-box-main">
+            <p class="rating-box-text mb-0">Rated by guests who stayed here</p>
+          </div>
+          <div class="rating-box-stats">
+            <div>
+              <strong><%= stats.average.toFixed(2) %></strong>
+              <span class="rating-stars"><i class="fa-solid fa-star"></i></span>
+            </div>
+            <div>
+              <strong><%= stats.count %></strong>
+              <span><%= stats.count === 1 ? "Review" : "Reviews" %></span>
+            </div>
+          </div>
+        </div>
+      <% } else { %>
+        <div class="rating-box rating-box-empty">
+          <p class="rating-box-text mb-0">No reviews yet. Be the first to share your stay.</p>
+        </div>
+      <% } %>
+
+      <!-- Host -->
+      <div class="host-row">
+        <div class="host-avatar"><%= hostInitial %></div>
+        <div>
+          <p class="host-name">Hosted by <%= host %></p>
+          <p class="host-meta">Listed on Wanderlust</p>
+        </div>
+      </div>
+
+      <!-- Highlights -->
+      <ul class="highlight-list">
+        <li>
+          <i class="fa-solid fa-location-dot"></i>
+          <div>
+            <strong>In <%= listing.location %></strong>
+            <p><%= listing.location %>, <%= listing.country %></p>
+          </div>
+        </li>
+        <li>
+          <i class="fa-solid fa-user-group"></i>
+          <div>
+            <strong>Fits up to <%= maxGuests %> guests</strong>
+            <p><%= bedrooms %> bedrooms, <%= beds %> beds and <%= bathrooms %> bathrooms</p>
+          </div>
+        </li>
+      </ul>
+
+      <!-- Description -->
+      <section class="listing-section">
+        <p class="listing-description<%= isLongDescription ? ' is-collapsed' : '' %>" id="listingDescription"><%= description %></p>
+        <% if (isLongDescription) { %>
+          <button type="button" class="show-more-btn" data-toggle-description>Show more</button>
+        <% } %>
+      </section>
+
+      <!-- Amenities -->
+      <section class="listing-section">
+        <h2 class="section-heading">What this place offers</h2>
+        <% if (amenities.length) { %>
+          <div class="amenity-grid" id="amenityGrid">
+            <% amenities.forEach((name, i) => { %>
+              <div class="amenity-item<%= i >= 6 ? ' amenity-extra' : '' %>">
+                <i class="<%= amenityIcon(name) %>"></i>
+                <span><%= name %></span>
+              </div>
+            <% }) %>
+          </div>
+          <% if (amenities.length > 6) { %>
+            <button type="button" class="show-more-btn" data-toggle-amenities data-count="<%= amenities.length %>">
+              Show all <%= amenities.length %> amenities
+            </button>
+          <% } %>
+        <% } else { %>
+          <p class="text-muted mb-0">No amenities listed yet.</p>
+        <% } %>
+      </section>
+
+      <!-- Calendar -->
+      <section class="listing-section" id="calendarSection">
+        <h2 class="section-heading" id="calendarHeading">Select check-in date</h2>
+        <p class="section-subheading" id="calendarSub">Add your travel dates for exact pricing</p>
+
+        <div class="calendar-nav">
+          <button type="button" class="carousel-btn" id="calPrev" aria-label="Previous month">
+            <i class="fa-solid fa-chevron-left"></i>
+          </button>
+          <button type="button" class="carousel-btn" id="calNext" aria-label="Next month">
+            <i class="fa-solid fa-chevron-right"></i>
+          </button>
+        </div>
+
+        <div class="calendar-months" id="calendarMonths"></div>
+
+        <div class="calendar-footer">
+          <button type="button" class="show-more-btn" id="clearDates">Clear dates</button>
+        </div>
+      </section>
+
+      <!-- Reviews -->
+      <section class="listing-section" id="reviews">
+        <h2 class="section-heading">
+          <i class="fa-solid fa-star"></i>
+          <% if (stats.count) { %>
+            <%= stats.average.toFixed(2) %> &middot; <%= stats.count %> <%= stats.count === 1 ? "review" : "reviews" %>
+          <% } else { %>
+            No reviews yet
+          <% } %>
+        </h2>
+
+        <% if (reviews.length) { %>
+          <div class="review-grid">
+            <% for (let review of reviews) { %>
+              <article class="review-card">
+                <div class="review-head">
+                  <div class="host-avatar review-avatar"><%= (review.author?.name || "G").charAt(0).toUpperCase() %></div>
+                  <div>
+                    <strong><%= review.author?.name || "Guest" %></strong>
+                    <p class="review-rating mb-0"><i class="fa-solid fa-star"></i> <%= review.rating %></p>
+                  </div>
+                </div>
+                <p class="review-comment"><%= review.comment %></p>
+                <form method="POST" action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE">
+                  <button class="btn btn-sm btn-outline-dark">Delete</button>
+                </form>
+              </article>
+            <% } %>
+          </div>
+        <% } %>
+
+        <form action="/listings/<%= listing._id %>/reviews" method="POST" novalidate class="needs-validation review-form">
+          <h3 class="review-form-title">Leave a review</h3>
+          <div class="mb-3">
+            <label for="rating" class="form-label">Rating: <span id="ratingValue">5</span> / 5</label>
+            <input type="range" min="1" max="5" value="5" id="rating" name="review[rating]" class="form-range">
+          </div>
+          <div class="mb-3">
+            <label for="comment" class="form-label">Comments</label>
+            <textarea name="review[comment]" id="comment" rows="4" class="form-control" required></textarea>
+            <div class="invalid-feedback">Please add some comments for reviews</div>
+          </div>
+          <button class="btn edit-btn">Submit</button>
+        </form>
+      </section>
+
+      <!-- Manage listing -->
+      <section class="listing-section manage-row">
+        <a href="/listings/<%= listing._id %>/edit" class="btn btn-dark">Edit listing</a>
+        <form method="POST" action="/listings/<%= listing._id %>?_method=DELETE"
+              onsubmit="return confirm('Delete this listing? This cannot be undone.');">
+          <button type="submit" class="btn btn-outline-dark">Delete listing</button>
+        </form>
+      </section>
+
+    </div>
+
+    <!-- Booking card: sticks to the top of the viewport while the page scrolls -->
+    <div class="col-lg-5 col-xl-4">
+      <aside class="booking-sticky">
+        <div class="booking-tag">
+          <i class="fa-solid fa-tag"></i>
+          <span>Prices include all fees</span>
+        </div>
+
+        <div class="booking-card">
+          <div class="booking-price" id="priceLine">
+            &#8377;<%= price.toLocaleString("en-IN") %> <span>night</span>
+          </div>
+
+          <form id="bookingForm" method="POST" action="/listings/<%= listing._id %>/bookings" novalidate>
+            <div class="booking-dates">
+              <button type="button" class="booking-date booking-date-start" data-pick="checkIn">
+                <span class="booking-date-label">CHECK-IN</span>
+                <span class="booking-date-value" id="checkInText">Add date</span>
+              </button>
+              <button type="button" class="booking-date" data-pick="checkOut">
+                <span class="booking-date-label">CHECKOUT</span>
+                <span class="booking-date-value" id="checkOutText">Add date</span>
+              </button>
+            </div>
+
+            <div class="booking-guests">
+              <label for="bookingGuests" class="booking-date-label">GUESTS</label>
+              <select id="bookingGuests" name="guests" class="booking-guests-select">
+                <% for (let n = 1; n <= maxGuests; n++) { %>
+                  <option value="<%= n %>" <%= prefill.guests === n ? "selected" : "" %>><%= n %> guest<%= n > 1 ? "s" : "" %></option>
+                <% } %>
+              </select>
+            </div>
+
+            <input type="hidden" name="checkIn" id="checkInInput" value="<%= prefill.checkIn %>">
+            <input type="hidden" name="checkOut" id="checkOutInput" value="<%= prefill.checkOut %>">
+
+            <% if (bookingError) { %>
+              <div class="booking-error" role="alert"><%= bookingError %></div>
+            <% } else { %>
+              <div class="booking-error" id="bookingError" role="alert" hidden></div>
+            <% } %>
+
+            <button type="submit" class="btn booking-reserve" id="reserveBtn" disabled>Reserve</button>
+          </form>
+
+          <p class="booking-note">You won't be charged yet</p>
+        </div>
+      </aside>
+    </div>
+
+  </div>
+</div>
+
+<!-- Data for the calendar and booking card -->
+<script id="listing-data" type="application/json"><%- JSON.stringify(pageData).replace(/</g, "\\u003c") %></script>
+<script src="/js/listing.js"></script>

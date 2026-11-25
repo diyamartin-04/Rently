@@ -1,0 +1,176 @@
+<% layout("listings/layouts/boilerplate") %>
+
+<!-- Hero with destination and guest search -->
+<section class="hero-section mt-3">
+  <div class="hero-content">
+    <h1 class="hero-title">Find your next place to stay</h1>
+    <p class="hero-tagline">Cottages, lofts and homes from hosts around the world, all in one place.</p>
+
+    <form action="/listings" method="GET" role="search" class="hero-search">
+      <div class="hero-search-bar">
+        <div class="hero-search-field hero-search-where">
+          <!-- <label for="where" class="hero-search-label">Where</label> -->
+          <input id="where" type="search" name="q" class="hero-search-input"
+                 placeholder="Search destinations" autocomplete="off">
+        </div>
+        <div class="hero-search-field hero-search-who">
+          <!-- <label for="who" class="hero-search-label">Who</label> -->
+          <select id="who" name="guests" class="hero-search-input">
+            <option value="">Add guests</option>
+            <option value="1">1 guest</option>
+            <option value="2">2 guests</option>
+            <option value="4">4 guests</option>
+            <option value="6">6+ guests</option>
+          </select>
+        </div>
+        <button class="btn hero-search-btn" type="submit" aria-label="Search">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <span class="hero-search-btn-text">Search</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<!-- Guest favourites carousel -->
+<% if (guestFavourites.length) { %>
+<section class="home-section">
+  <div class="d-flex justify-content-between align-items-end mb-3">
+    <div>
+      <h2 class="section-title">Guest favourite homes</h2>
+      <p class="section-subtitle mb-0">Stays with consistently high ratings from guests</p>
+    </div>
+    <div class="carousel-controls">
+      <button type="button" class="carousel-btn" data-scroll="-1" aria-label="Scroll left">
+        <i class="fa-solid fa-chevron-left"></i>
+      </button>
+      <button type="button" class="carousel-btn" data-scroll="1" aria-label="Scroll right">
+        <i class="fa-solid fa-chevron-right"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="guest-scroller" id="guestScroller">
+    <% for (let listing of guestFavourites) { %>
+      <article class="guest-card">
+        <div class="guest-card-media">
+          <a href="/listings/<%= listing._id %>">
+            <img src="<%= listing.image.url %>" alt="<%= listing.title %>" loading="lazy">
+          </a>
+          <span class="guest-badge">Guest favourite</span>
+          <button type="button" class="wishlist-btn" data-id="<%= listing._id %>"
+                  aria-label="Save <%= listing.title %> to wishlist" aria-pressed="false">
+            <i class="fa-regular fa-heart"></i>
+          </button>
+        </div>
+        <a href="/listings/<%= listing._id %>" class="guest-card-title"><%= listing.title %></a>
+        <div class="guest-card-meta">
+          &#8377; <%= listing.price.toLocaleString("en-IN") %> night
+          <span class="guest-card-dot">&middot;</span>
+          <i class="fa-solid fa-star"></i> <%= listing.average.toFixed(2) %>
+          <span class="guest-card-count">(<%= listing.reviewCount %>)</span>
+        </div>
+      </article>
+    <% } %>
+  </div>
+</section>
+<% } %>
+
+<!-- Popular destinations -->
+<% if (destinations.length) { %>
+<section class="home-section">
+  <h2 class="section-title">Popular destinations</h2>
+  <p class="section-subtitle">Places with the most stays on Wanderlust</p>
+  <div class="row row-cols-lg-4 row-cols-md-2 row-cols-1 g-4">
+    <% for (let d of destinations) { %>
+      <div class="col">
+        <a class="destination-card" href="/listings?q=<%= encodeURIComponent(d.location) %>">
+          <img src="<%= d.image %>" alt="<%= d.location %>">
+          <div class="destination-card-label">
+            <h5><%= d.location %></h5>
+            <p><%= d.country %> &middot; <%= d.count %> <%= d.count === 1 ? "stay" : "stays" %></p>
+          </div>
+        </a>
+      </div>
+    <% } %>
+  </div>
+</section>
+<% } %>
+
+<!-- Browse by country -->
+<% if (countries.length) { %>
+<section class="home-section">
+  <h2 class="section-title">Browse by country</h2>
+  <p class="section-subtitle">Find stays in the countries you want to explore</p>
+  <div>
+    <% for (let c of countries) { %>
+      <a class="country-pill" href="/listings?q=<%= encodeURIComponent(c.name) %>">
+        <%= c.name %> <span class="country-pill-count">(<%= c.count %>)</span>
+      </a>
+    <% } %>
+  </div>
+</section>
+<% } %>
+
+<!-- Featured properties -->
+<section class="home-section">
+  <div class="d-flex justify-content-between align-items-end mb-3">
+    <div>
+      <h2 class="section-title">Featured properties</h2>
+      <p class="section-subtitle mb-0">Our newest listings</p>
+    </div>
+    <a href="/listings" class="fw-semibold text-dark text-nowrap">View all &rarr;</a>
+  </div>
+
+  <% if (listings.length) { %>
+    <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1 g-4">
+      <% for (let listing of listings) { %>
+        <%- include("includes/listing-card", { listing }) %>
+      <% } %>
+    </div>
+  <% } else { %>
+    <div class="empty-state">
+      <i class="fa-regular fa-compass"></i>
+      <h4>No listings yet</h4>
+      <p>Be the first to <a href="/listings/new">add a property</a>.</p>
+    </div>
+  <% } %>
+</section>
+
+<!-- Why choose Wanderlust -->
+<section class="home-section">
+  <h2 class="section-title text-center">Why choose Wanderlust</h2>
+  <p class="section-subtitle text-center">Everything you need to find or share a place to stay</p>
+  <div class="row row-cols-md-3 row-cols-1 g-4">
+    <div class="col">
+      <div class="card border-0 shadow-sm h-100 why-card">
+        <div class="why-icon"><i class="fa-solid fa-map-location-dot"></i></div>
+        <h5>Easy to explore</h5>
+        <p class="mb-0">Search by city, location or country and compare nightly prices in rupees.</p>
+      </div>
+    </div>
+    <div class="col">
+      <div class="card border-0 shadow-sm h-100 why-card">
+        <div class="why-icon"><i class="fa-solid fa-star"></i></div>
+        <h5>Guest reviews</h5>
+        <p class="mb-0">Every listing has a review section, so you can see what past guests thought before you decide.</p>
+      </div>
+    </div>
+    <div class="col">
+      <div class="card border-0 shadow-sm h-100 why-card">
+        <div class="why-icon"><i class="fa-solid fa-house-circle-check"></i></div>
+        <h5>Simple hosting</h5>
+        <p class="mb-0">Add your property in a few minutes, and update its details and pricing whenever you need to.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Call to action -->
+<section class="home-section mb-3">
+  <div class="cta-banner">
+    <h2 class="section-title">Have a place to share?</h2>
+    <p class="section-subtitle">List your property on Wanderlust and reach travellers looking for their next stay.</p>
+    <a href="/listings/new" class="btn edit-btn btn-lg">List your property</a>
+  </div>
+</section>

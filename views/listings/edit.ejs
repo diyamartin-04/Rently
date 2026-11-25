@@ -1,0 +1,73 @@
+<% layout("listings/layouts/boilerplate") %>
+<div class="row mt-3">
+  <div class="col-8 offset-2">
+    <h3>Edit Your Listing</h3>
+<form method="POST" action="/listings/<%=listing._id%>?_method=PUT" novalidate class="needs-validation">
+      
+      <div class="mb-3">
+        <label for="title" class="form-label">Title</label>
+        <input name="listing[title]" value="<%= listing.title %>" type="text" class="form-control" required>
+        <div class="invalid-feedback">Please enter a valid title.</div>
+      </div>
+
+      <div class="mb-3">
+        <label for="description" class="form-label">Description</label>
+        <textarea name="listing[description]" class="form-control" required><%= listing.description %></textarea>
+        <div class="invalid-feedback">Please enter a short description.</div>
+      </div>
+
+      <div class="mb-3">
+        <label for="image" class="form-label">Image Link</label>
+        <input name="listing[image][url]" value="<%= listing.image.url %>" type="text" class="form-control">
+      </div>
+
+      <div class="row">
+        <div class="mb-3 col-md-4">
+          <label for="price" class="form-label">Price</label>
+          <input name="listing[price]" value="<%= listing.price %>" type="number" class="form-control" required>
+          <div class="invalid-feedback">Price should be valid.</div>
+        </div>
+
+        <div class="mb-3 col-md-8">
+          <label for="country" class="form-label">Country</label>
+          <input name="listing[country]" value="<%= listing.country %>" type="text" class="form-control" required>
+          <div class="invalid-feedback">Country should be valid.</div>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="location" class="form-label">Location</label>
+        <input name="listing[location]" value="<%= listing.location %>" type="text" class="form-control" required>
+        <div class="invalid-feedback">Location should be valid.</div>
+      </div>
+
+      <div class="row">
+        <div class="mb-3 col-md-4">
+          <label for="bedrooms" class="form-label">Bedrooms</label>
+          <input id="bedrooms" name="listing[bedrooms]" value="<%= listing.bedrooms ?? 1 %>" type="number" min="1" max="50" step="1" class="form-control" required>
+        </div>
+        <div class="mb-3 col-md-4">
+          <label for="beds" class="form-label">Beds</label>
+          <input id="beds" name="listing[beds]" value="<%= listing.beds ?? 1 %>" type="number" min="1" max="50" step="1" class="form-control" required>
+        </div>
+        <div class="mb-3 col-md-4">
+          <label for="bathrooms" class="form-label">Bathrooms</label>
+          <input id="bathrooms" name="listing[bathrooms]" value="<%= listing.bathrooms ?? 1 %>" type="number" min="1" max="50" step="1" class="form-control" required>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="amenities" class="form-label">Amenities (comma separated)</label>
+        <input id="amenities" name="listing[amenities]" value="<%= (listing.amenities || []).join(', ') %>" class="form-control">
+      </div>
+
+      <div class="mb-3">
+        <label for="guests" class="form-label">Max guests</label>
+        <input id="guests" name="listing[guests]" value="<%= listing.guests ?? 2 %>" type="number" min="1" max="20" step="1" class="form-control" required>
+        <div class="invalid-feedback">Enter a number between 1 and 20.</div>
+      </div>
+
+      <button class="btn btn-dark edit-btn mt-3">Save Changes</button>
+    </form>
+  </div>
+</div>

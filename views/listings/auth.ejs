@@ -1,0 +1,76 @@
+<% layout("listings/layouts/boilerplate") %>
+
+<% const isLogin = mode === "login"; %>
+
+<div class="auth-wrapper">
+  <div class="auth-card">
+    <div class="auth-brand"><i class="fa-solid fa-compass"></i></div>
+
+    <h1 class="auth-title"><%= isLogin ? "Log in to Wanderlust" : "Create your account" %></h1>
+    <p class="auth-subtitle">
+      <%= isLogin ? "Welcome back. Enter your details to continue." : "Sign up to add properties and leave reviews." %>
+    </p>
+
+    <% if (errors.length) { %>
+      <div class="alert alert-danger" role="alert">
+        <ul class="mb-0 ps-3">
+          <% for (let error of errors) { %>
+            <li><%= error %></li>
+          <% } %>
+        </ul>
+      </div>
+    <% } %>
+
+    <form method="POST" action="<%= isLogin ? '/login' : '/signup' %>" novalidate class="needs-validation">
+      <input type="hidden" name="next" value="<%= typeof next !== 'undefined' && next ? next : '/' %>">
+
+      <% if (!isLogin) { %>
+        <div class="mb-3">
+          <label for="name" class="form-label">Full name</label>
+          <input id="name" name="name" type="text" class="form-control auth-input"
+                 value="<%= values.name || '' %>" placeholder="Your name" minlength="2" maxlength="50" required autocomplete="name">
+          <div class="invalid-feedback">Please enter your name (at least 2 characters).</div>
+        </div>
+      <% } %>
+
+      <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <input id="email" name="email" type="email" class="form-control auth-input"
+               value="<%= values.email || '' %>" placeholder="you@example.com" required autocomplete="email">
+        <div class="invalid-feedback">Please enter a valid email address.</div>
+      </div>
+
+      <div class="mb-3">
+        <label for="password" class="form-label">Password</label>
+        <input id="password" name="password" type="password" class="form-control auth-input"
+               placeholder="<%= isLogin ? 'Your password' : 'At least 8 characters' %>"
+               minlength="<%= isLogin ? 1 : 8 %>" required
+               autocomplete="<%= isLogin ? 'current-password' : 'new-password' %>">
+        <div class="invalid-feedback">
+          <%= isLogin ? "Please enter your password." : "Password must be at least 8 characters." %>
+        </div>
+      </div>
+
+      <% if (!isLogin) { %>
+        <div class="mb-3">
+          <label for="confirmPassword" class="form-label">Confirm password</label>
+          <input id="confirmPassword" name="confirmPassword" type="password" class="form-control auth-input"
+                 placeholder="Re-enter your password" minlength="8" required autocomplete="new-password">
+          <div class="invalid-feedback">Please re-enter your password.</div>
+        </div>
+      <% } %>
+
+      <button type="submit" class="btn edit-btn w-100 auth-submit">
+        <%= isLogin ? "Log in" : "Continue" %>
+      </button>
+    </form>
+
+    <p class="auth-switch mb-0">
+      <% if (isLogin) { %>
+        New to Wanderlust? <a href="/signup">Create an account</a>
+      <% } else { %>
+        Already have an account? <a href="/login">Log in</a>
+      <% } %>
+    </p>
+  </div>
+</div>

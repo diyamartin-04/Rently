@@ -1,0 +1,37 @@
+<% layout("listings/layouts/boilerplate") %>
+<%
+  const fmt = (key) => {
+    const [y, m, d] = key.split("-");
+    return `${m}/${d}/${y}`;
+  };
+%>
+
+<div class="trips-page">
+  <h1 class="trips-heading">My trips</h1>
+
+  <% if (bookings.length === 0) { %>
+    <div class="empty-state">
+      <i class="fa-regular fa-compass"></i>
+      <h4>No trips yet</h4>
+      <p>When you reserve a stay, it will appear here. <a href="/listings">Browse listings</a></p>
+    </div>
+  <% } else { %>
+    <div class="trips-list">
+      <% for (let booking of bookings) { %>
+        <% const l = booking.listing; %>
+        <a class="trip-card" href="/bookings/<%= booking._id %>">
+          <div class="trip-card-body">
+            <h2 class="trip-title"><%= l ? l.title : "Listing no longer available" %></h2>
+            <p class="trip-location"><%= l ? `${l.location}, ${l.country}` : "" %></p>
+            <p class="trip-dates">
+              <%= fmt(booking.checkIn) %> &ndash; <%= fmt(booking.checkOut) %>
+              &middot; <%= booking.nights %> <%= booking.nights === 1 ? "night" : "nights" %>
+              &middot; <%= booking.guests %> <%= booking.guests === 1 ? "guest" : "guests" %>
+            </p>
+          </div>
+          <div class="trip-total">&#8377;<%= booking.total.toLocaleString("en-IN") %></div>
+        </a>
+      <% } %>
+    </div>
+  <% } %>
+</div>

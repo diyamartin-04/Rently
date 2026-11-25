@@ -1,0 +1,41 @@
+<% layout("listings/layouts/boilerplate") %>
+<%
+  const l = booking.listing;
+  const fmt = (key) => {
+    const [y, m, d] = key.split("-");
+    return `${m}/${d}/${y}`;
+  };
+%>
+
+<div class="confirm-page">
+  <div class="confirm-card">
+    <div class="confirm-icon"><i class="fa-solid fa-circle-check"></i></div>
+    <h1 class="confirm-heading">Your stay is reserved</h1>
+    <p class="confirm-sub">
+      Thanks, <%= currentUser.name %>. Payments aren't collected on Wanderlust yet, so you won't be charged.
+    </p>
+
+    <% if (l) { %>
+      <img class="confirm-photo" src="<%= l.image?.url %>" alt="<%= l.title %>">
+      <h2 class="confirm-title"><%= l.title %></h2>
+      <p class="confirm-location"><%= l.location %>, <%= l.country %></p>
+    <% } else { %>
+      <p class="text-muted">This listing is no longer available.</p>
+    <% } %>
+
+    <dl class="confirm-details">
+      <div><dt>Check-in</dt><dd><%= fmt(booking.checkIn) %></dd></div>
+      <div><dt>Checkout</dt><dd><%= fmt(booking.checkOut) %></dd></div>
+      <div><dt>Guests</dt><dd><%= booking.guests %></dd></div>
+      <div><dt>Nights</dt><dd><%= booking.nights %></dd></div>
+      <div><dt>Total</dt><dd>&#8377;<%= booking.total.toLocaleString("en-IN") %></dd></div>
+    </dl>
+
+    <div class="confirm-actions">
+      <a href="/bookings" class="btn btn-outline-dark">My trips</a>
+      <% if (l) { %>
+        <a href="/listings/<%= l._id %>" class="btn edit-btn">View listing</a>
+      <% } %>
+    </div>
+  </div>
+</div>
